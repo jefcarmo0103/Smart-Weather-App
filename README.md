@@ -2,7 +2,7 @@
 
 Aplicativo da matéria de Programação Mobile
 
-##Linguagem
+#Linguagem
 
 O aplicativo foi desenvolvido usando JavaScript com o framework Ract Native.
 
