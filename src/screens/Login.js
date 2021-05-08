@@ -1,40 +1,59 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, KeyboardAvoidingView, Image, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { setItem } from '../services/storage.js'
+import api from '../services/api.js';
 
-export default ({navigation}) => {
+export default ({ navigation }) => {
+
+    const [username, setUsername] = useState('');
+    const [pwd, setPassword] = useState('');
+
+    function submitLogin(){
+        api.post('/auth', {
+            username: username,
+            password: pwd
+        }).then((result) => {
+            setItem("token", result.data.token);
+            navigation.navigate('Home');
+        }).catch((err) => {
+            console.log(err);
+        })
+
+    }
 
     return (
         <KeyboardAvoidingView style={styles.background}>
             <View style={styles.containerLogo}>
-                <Image 
-                    source={require('../assets/img/icon.png')} 
-                    style={ styles.img }
+                <Image
+                    source={require('../assets/img/icon.png')}
+                    style={styles.img}
                 />
             </View>
             <View style={styles.container}>
-                <TextInput 
+                <TextInput
                     style={styles.input}
-                    placeholder="E-mail"
+                    placeholder="Username"
                     autoCorrect={false}
-                    onChangeText={()=> {}}
+                    onChangeText={setUsername}
                 />
-                <TextInput 
+                <TextInput
                     style={styles.input}
-                    placeholder="Senha"
+                    placeholder="Password"
                     autoCorrect={false}
-                    onChangeText={()=> {}}
+                    onChangeText={setPassword}
+                    secureTextEntry={true}
                 />
 
-                <TouchableOpacity 
-                    style={styles.btnSubmit} 
-                    onPress={() => navigation.navigate('Home')}>
+                <TouchableOpacity
+                    style={styles.btnSubmit}
+                    onPress={submitLogin}>
 
                     <Text style={styles.submitText}>Acessar</Text>
                 </TouchableOpacity>
             </View>
         </KeyboardAvoidingView>
     )
-   
+
 };
 
 const styles = StyleSheet.create({
@@ -65,7 +84,7 @@ const styles = StyleSheet.create({
     },
     btnSubmit: {
         backgroundColor: '#35AAFF',
-        width:'90%',
+        width: '90%',
         height: 45,
         alignItems: 'center',
         justifyContent: 'center',
