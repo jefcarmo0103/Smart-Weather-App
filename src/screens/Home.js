@@ -10,6 +10,7 @@ export default ({ navigation }) => {
 
 
     const [disps, setDisps] = useState([]);
+    const [params, setParams] = useState([]);
 
 
     function getNameStation(name) {
@@ -41,20 +42,83 @@ export default ({ navigation }) => {
         { type: 'Pressão', value: '1017 mbar', status: 1 },
     ]
 
+    function getPropertiesAndValues(obj){
+        
+        const props = []; 
+        for(var key in obj) {
+            var value = obj[key];
+            
+            if(key == "humidity")
+                props.push({
+                    type: "Umidade",
+                    value: `${obj[key].value}%`,
+                    status: 1
+                });
+            
+            else if(key == "temperature")
+                props.push({
+                    type: "Temperatura",
+                    value: `${obj[key].value} C`,
+                    status: 1
+                });
+
+            else if(key == "ground_humidity")
+                props.push({
+                    type: "Umidade do Solo",
+                    value: `${obj[key].value}%`,
+                    status: 1
+                });
+
+            else if(key == "luminosity")
+                props.push({
+                    type: "Luminosidade",
+                    value: `${obj[key].value}`,
+                    status: 1
+                });
+
+            else if(key == "pressure")
+                props.push({
+                    type: "Pressão",
+                    value: `${obj[key].value} hPa`,
+                    status: 1
+                });
+
+            else if(key == "rain_mm")
+                props.push({
+                    type: "Milímetros de Chuva",
+                    value: `${obj[key].value} mm`,
+                    status: 1
+                });
+
+            else if(key == "wind_speed")
+                props.push({
+                    type: "Velocidade do Vento",
+                    value: `${obj[key].value} km/h`,
+                    status: 1
+                });
+
+        }
+
+        return props;
+    }
+
+
+
     const modalizeRef = useRef(null);
 
     function onOpen() {
         modalizeRef.current?.open();
+
+        setInterval(() => {
+            api.get("/StateSensors/ngsi-ld%3Astation%3A003")
+            .then((result) => {
+                let r = getPropertiesAndValues(result.data);
+                setParams(r);
+            })
+        }, 5000)
+
     }
-
-    const mockDisp = [
-        { id: 1, dispositivo: 'Dispositivo 1', status: 1 },
-        { id: 2, dispositivo: 'Dispositivo 2', status: 1 },
-        { id: 3, dispositivo: 'Dispositivo 3', status: 0 },
-        { id: 4, dispositivo: 'Dispositivo 4', status: 1 },
-        { id: 5, dispositivo: 'Dispositivo 5', status: 2 },
-
-    ];
+    
 
     return (
         <>
@@ -79,7 +143,7 @@ export default ({ navigation }) => {
                 ref={modalizeRef}
                 snapPoint={500}
                 flatListProps={{
-                    data: data,
+                    data: params,
                     renderItem: _renderItem,
                     keyExtractor: item => item.type
                 }}
